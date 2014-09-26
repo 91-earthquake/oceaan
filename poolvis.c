@@ -1,7 +1,7 @@
 #pragma config(StandardModel, "RVW REMBOT")
 
 // Include libraries
-// LOLOLO ik ben sil en dit is een test
+// testding
 #include "JoystickDriver.c"
 
 // Main task
