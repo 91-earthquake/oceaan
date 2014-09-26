@@ -36,7 +36,7 @@ task main(){
    	motor[motorA] = -100;
    }
    */
-   
+   // waarom heet dit potvis????, hoor wel van jullie
    // Send values to the motors
    motor[leftMotor] = lmot;
    motor[rightMotor] = rmot;
