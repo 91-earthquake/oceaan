@@ -18,25 +18,29 @@
 #include "JoystickDriver.c"
 
 task main(){
-	while(true){
+
+// Set a value to define a 'dead area' on the joystick
+int treshold = 8;
+
+// Define the y1, x1, y2, x2 variables
+int y1,
+    x1,
+    y2,
+    x2;
+
+// Define the variables for the power and the steering,
+// And the left and the right motor, but engine sounds better
+int power,
+    steering,
+    left_engine,
+    right_engine;
+
+servo[servo1] = 20;
+//servo[servo2] = 255;
+
+while(true){
 		// Get the joystick settings
 		getJoystickSettings(joystick);
-
-		// Set a value to define a 'dead area' on the joystick
-		int treshold = 8;
-
-		// Define the y1, x1, y2, x2 variables
-		int y1,
-		    x1,
-		    y2,
-		    x2;
-
-		// Define the variables for the power and the steering,
-		// And the left and the right motor, but engine sounds better
-		int power,
-		    steering,
-		    left_engine,
-		    right_engine;
 
 
 		// Only set the values to y1 if the value exeeds the treshold
@@ -80,6 +84,17 @@ task main(){
 		motor[motorF] = right_engine;
 		motor[motorG] = left_engine;
 
+		// Fix the servo 'n stuff
+		if(joy1Btn(1)){
+			servo[servo1] =25;
+		// servo[servo2] = 255;
+		}
+		
+		if(joy1Btn(2)){
+			servo[servo1] = 235;
+		//	servo[servo2] = 0;
+		}
+		
 		wait1Msec(10);
 	}
 }
