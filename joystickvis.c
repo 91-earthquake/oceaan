@@ -25,12 +25,25 @@
 
 task main(){
 
+bool  switching;
+
+
+      // The following variables are config variables:
       // Set a value to define a 'Dead zone' on the joystick
       // Can be modified, but 5 should be allright
 int   treshold = 8,
 
       // Define the boost button
-      boost_button = 12;
+			// Make sure to add one
+      boost_button = 12,
+      
+      // Define the servo_button
+      // Make sure to add one
+      servo_button = 6,
+      
+      // The amount of milliseconds to wait
+      // At the end of the loop
+      loop_delay = 10;
 
 	  	// The steering sensitivity, it's a factor
       // So the value will be multiplied by this
@@ -53,6 +66,10 @@ int   power,
       steering,
       left_engine,
       right_engine;
+      
+// Reset the servo's
+servo[servo1] = 0;
+servo[servo2] = 0;
 
 while(true){
 		// Get the joystick settings
@@ -86,11 +103,12 @@ while(true){
 		if(!joy1Btn(boost_button)){
 			power = power / limiter;
 			steering = steering / limiter;
-		}else{}
+		}
 	
 		// Multiply the steering variable by the given factor
 		// In the variable steer_sensitivity
 		steering = steering * steer_sensitivity;
+		
 		
 		// Assign the power to the variables
 		right_engine = power - steering;
@@ -100,8 +118,22 @@ while(true){
 		motor[motorD] = right_engine;
 		motor[motorF] = left_engine;
 		
-		// Wait 10 milliseconds
+		// Controll the servo's
+		if(joy1Btn(servo_button)){
+			if(switching){
+				switching = false;
+				servo[servo1] = 0;
+			}else{
+				switching = true;
+				servo[servo1] = 200;
+			}
+			wait1Msec(5);
+		}
+		
+		
+		
+		// Wait the amount of milliseconds given above
 		// So the loop runs 100 times per second
-		wait1Msec(10);
+		wait1Msec(loop_delay);
 	}
 }
