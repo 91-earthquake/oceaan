@@ -1,0 +1,9 @@
+Today we worked on 3 different things. Sam and Sil worked on a aluminium block that will hold the motor so it wil be very ferm in his place.
+Jeroen and Caelin improved the lift system by making katrolls. 
+Mark and Sibren improved the program and rode with the robot to practise.
+Nora and Harry were not with us today, Klaas helped everyone and walked around.
+The servo function is now fixed.
+The atonomous part cabn detect when it on the ramp.
+We started using Paper notes on the wall to keep track of progress and
+thing still need to be done.
+
