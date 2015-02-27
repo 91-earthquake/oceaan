@@ -1,19 +1,26 @@
 #pragma config(Hubs, S1, MatrxRbtcs, none, none, none)
+#pragma config(Hubs, S2, MatrxRbtcs, none, none, none)
 #pragma config(Sensor, S1, , sensorI2CMuxController)
-#pragma config(Motor, mtr_Matrix_S1_1, motorD, tmotorMatrix, PIDControl, reversed, encoder)
-#pragma config(Motor, mtr_Matrix_S1_2, motorE, tmotorMatrix, PIDControl, encoder)
-#pragma config(Motor, mtr_Matrix_S1_3, motorF, tmotorMatrix, PIDControl, encoder)
-#pragma config(Motor, mtr_Matrix_S1_4, motorG, tmotorMatrix, PIDControl, encoder)
+#pragma config(Motor, mtr_Matrix_S1_1, motorA, tmotorMatrix, PIDControl, encoder)
+#pragma config(Motor, mtr_Matrix_S1_2, motorB, tmotorMatrix, PIDControl, encoder)
+#pragma config(Motor, mtr_Matrix_S1_3, motorC, tmotorMatrix, PIDControl, encoder)
+#pragma config(Motor, mtr_Matrix_S1_4, motorD, tmotorMatrix, PIDControl, encoder)
+#pragma config(Motor, mtr_Matrix_S2_1, motorE, tmotorMatrix, PIDControl, encoder)
+#pragma config(Motor, mtr_Matrix_S2_2, motorF, tmotorMatrix, PIDControl, encoder)
+#pragma config(Motor, mtr_Matrix_S2_3, motorG, tmotorMatrix, PIDControl, reversed, encoder)
+#pragma config(Motor, mtr_Matrix_S2_4, motorH, tmotorMatrix, PIDControl, reversed, encoder)
 #pragma config(Servo, srvo_Matrix_S1_1, servo1, tServoNone)
 #pragma config(Servo, srvo_Matrix_S1_2, servo2, tServoNone)
 #pragma config(Servo, srvo_Matrix_S1_3, servo3, tServoNone)
 #pragma config(Servo, srvo_Matrix_S1_4, servo4, tServoNone)
+#pragma config(Servo, srvo_Matrix_S2_1, servo5, tServoNone)
+#pragma config(Servo, srvo_Matrix_S2_2, servo6, tServoNone)
+#pragma config(Servo, srvo_Matrix_S2_3, servo7, tServoNone)
+#pragma config(Servo, srvo_Matrix_S2_4, servo8, tServoNone)
 
 /**
- * @version	1.1
- * @author	 Earthquake
- * @license	Apache License
- * @link		 https://github.com/91-earthquake/oceaan/blob/master/joystickvis.c
+ * @author   Earthquake
+ * @link     https://github.com/91-earthquake/oceaan/blob/master/joystickvis.c
  */
 
 // Open a the joystick debugger window
@@ -24,54 +31,61 @@
 #include "JoystickDriver.c"
 
 task main(){
+	      // A temporary variable to switch the servo's
+	bool  switching = false,
 
-bool  switching = true,
+	      // Another temporary variable
+	      releasebtn = false;
 
-      releasebtn = true;
+	      // The following variables are config variables:
+	      // Set a value to define a 'Dead zone' on the joystick
+	      // Can be modified, but 5 should be allright
+	int   treshold = 8,
 
-      // The following variables are config variables:
-      // Set a value to define a 'Dead zone' on the joystick
-      // Can be modified, but 5 should be allright
-int   treshold = 8,
+	      // Define the boost button
+	      // Make sure to add one
+	      btn_boost = 6,
 
-      // Define the boost button
-      // Make sure to add one
-      boost_button = 12,
+	      // Define the servo button
+	      // Make sure to add one
+	      btn_servo = 2,
 
-      // Define the servo_button
-      // Make sure to add one
-      servo_button = 6,
+	      // This is the
+	      btn_liftup = 7,
 
-      // The amount of milliseconds to wait
-      // At the end of the loop
-      loop_delay = 10;
+	      btn_liftdown = 8,
 
-      // The steering sensitivity, it's a factor
-      // So the value will be multiplied by this
-float steer_sensitivity = 0.8,
+	      // The amount of milliseconds to wait
+	      // At the end of the loop
+	      loop_delay = 10,
 
-      // The value of the limiter
-      // If the power button isn't pressed,
-      // The power will be divided by this
-      limiter = 2.5;
+	      // The value of the limiter
+	      // If the power button isn't pressed,
+	      // The power will be divided by this
+	      limiter = 2;
 
-      // Define the y1, x1, y2, x2 variables
-int   y1,
-      x1,
-      y2,
-      x2;
+	      // The steering sensitivity,
+	      // the value will be divided by this times 10
+	float steer_sensitivity = 1;
 
-	    // Define the variables for the power and the steering,
-	    // And the left and the right motor, but engine sounds better
-int	  power,
-      steering,
-      left_engine,
-      right_engine;
+	      // Define the y1, x1, y2, x2 variables
+	int   y1,
+	      x1,
+	      y2,
+	      x2;
 
-// Reset the servo's
-servo[servo1] = 0;
+	      // Define the variables for the power and the steering,
+	      // And the left and the right motor, but engine sounds better
+	int   power,
+	      steering,
+	      left_engine,
+	      right_engine;
 
-while(true){
+	// Reset the servo's
+	servo[servo6] = 75;
+	servo[servo8] = 250;
+
+	while(true){
 		// Get the joystick settings
 		getJoystickSettings(joystick);
 
@@ -94,14 +108,13 @@ while(true){
 		x1 = (x1 * 100) / 128;
 
 		// Assign the y2 variable to the power variable
-		// BOOKMARK: make negative to reverse the power
-		power = y2;
+		power = -y2;
 
 		// Assign the x1 variable to the steering variable
 		steering = x1;
 
 		// Only divide by 2 if the boost is not pressed
-		if(!joy1Btn(boost_button)){
+		if(!joy1Btn(btn_boost)){
 			power = power / limiter;
 			steering = steering / limiter;
 		}
@@ -113,26 +126,39 @@ while(true){
 
 		// Assign the power to the variables
 		right_engine = power + steering;
-		left_engine	= power - steering;
+		left_engine  = power - steering;
 
 		// Assign the calculated values to the engines
-		motor[motorD] = left_engine;
-		motor[motorF] = right_engine;
+		motor[motorE] = left_engine;
+		motor[motorF] = left_engine;
+		motor[motorG] = right_engine;
+		motor[motorH] = right_engine;
 
-		// Controll the servo's
-		if(joy1Btn(servo_button) && releasebtn){
+		// Control the servo's
+		if(joy1Btn(btn_servo) && releasebtn){
 			if(switching){
 				switching = false;
-				servo[servo1] = 0;
+				servo[servo6] = 75;
+				servo[servo8] = 250;
 			}else{
 				switching = true;
-				servo[servo1] = 200;
+				servo[servo6] = 250;
+				servo[servo8] = 75;
 			}
 			releasebtn = false;
 		}
-		if(!joy1Btn(servo_button) && !releasebtn){
+		if(!joy1Btn(btn_servo) && !releasebtn){
 			releasebtn = true;
 		}
 
+		// Control the lift
+		if(joy1Btn(btn_liftup)) motor[motorA] = 60;
+		else motor[motorA] = 0;
+
+		if(joy1Btn(btn_liftdown)) motor[motorA] = -60;
+		else motor[motorA] = 0;
+
 		// Wait the amount of milliseconds given above
-		// So the loop runs 10
+		wait1Msec(loop_delay);
+	}
+}
