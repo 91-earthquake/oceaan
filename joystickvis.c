@@ -34,6 +34,43 @@
 // Include the joystick driver
 #include "JoystickDriver.c"
 
+  ////////////
+ // Config //
+////////////
+// Should the steering be reversed or not
+#define JOY_REVERSE_STEER false
+
+// Set a value to define a 'Dead zone' on the joystick
+// Can be modified, but 5 should be allright
+#define JOY_TRESHOLD 5
+
+// Define the boost button
+// Make sure to add one
+#define JOY_BTN_BOOST 12
+
+// The button to release the balls from the reservoir
+#define JOY_BTN_RELEASER 6
+
+// The button to grab a pipe
+#define JOY_BTN_GRABBER 5
+
+// The button to start the brush
+#define JOY_BTN_BRUSH 4
+
+// The amount of milliseconds to wait
+// At the end of the loop
+#define JOY_LOOP_DELAY 10
+
+// The value of the JOY_LIMITER
+// If the power button isn't pressed,
+// The power will be divided by this number
+#define JOY_LIMITER 2
+
+// The steering sensitivity,
+// the value will be divided by this
+#define JOY_STEER_SENSITIVITY 1
+
+
 task main(){
 	        /////////////////////////
 	       // Temporary variables //
@@ -48,44 +85,6 @@ task main(){
 	      releasebtn = false,
 	      releasebtn2 = false,
 	      releasebtn3 = false;
-
-	        ////////////
-	       // Config //
-	      ////////////
-
-	      // Reverse the steering, if you turn your joystick right,
-	      // and your robot turns left, set to true.
-	bool  reverse_steering = false;
-
-	      // Set a value to define a 'Dead zone' on the joystick
-	      // Can be modified, but 5 should be allright
-	int   treshold = 5,
-
-	      // Define the boost button
-	      // Make sure to add one
-	      btn_boost = 12,
-
-	      // The button to release the balls from the reservoir
-	      btn_releaser = 6,
-
-	      // The button to grab a pipe
-	      btn_grabber = 5,
-
-	      // The button to start the brush
-	      btn_brush = 4,
-
-	      // The amount of milliseconds to wait
-	      // At the end of the loop
-	      loop_delay = 10,
-
-	      // The value of the limiter
-	      // If the power button isn't pressed,
-	      // The power will be divided by this number
-	      limiter = 2,
-
-	      // The steering sensitivity,
-	      // the value will be divided by this
-	      steer_sensitivity = 1;
 
 	      // Define the variables for each joystick
 	int   joy1y1,
@@ -116,29 +115,29 @@ task main(){
 		// Only set the values if the value exeeds the treshold
 		//
 		// Joystick one (drivers joystick):
-		if (abs(joystick.joy1_y1) > treshold) joy1y1 = joystick.joy1_y1;
+		if (abs(joystick.joy1_y1) > JOY_TRESHOLD) joy1y1 = joystick.joy1_y1;
 		else joy1y1 = 0;
 
-		if (abs(joystick.joy1_x1) > treshold) joy1x1 = joystick.joy1_x1;
+		if (abs(joystick.joy1_x1) > JOY_TRESHOLD) joy1x1 = joystick.joy1_x1;
 		else joy1x1 = 0;
 
-		if (abs(joystick.joy1_y2) > treshold) joy1y2 = joystick.joy1_y2;
+		if (abs(joystick.joy1_y2) > JOY_TRESHOLD) joy1y2 = joystick.joy1_y2;
 		else joy1y2 = 0;
 
-		if (abs(joystick.joy1_x2) > treshold) joy1x2 = joystick.joy1_x2;
+		if (abs(joystick.joy1_x2) > JOY_TRESHOLD) joy1x2 = joystick.joy1_x2;
 		else joy1x2 = 0;
 
 		// Joystick two (co-pilot's joystick):
-		if (abs(joystick.joy2_y1) > treshold) joy2y1 = joystick.joy2_y1;
+		if (abs(joystick.joy2_y1) > JOY_TRESHOLD) joy2y1 = joystick.joy2_y1;
 		else joy2y1 = 0;
 
-		if (abs(joystick.joy2_x1) > treshold) joy2x1 = joystick.joy2_x1;
+		if (abs(joystick.joy2_x1) > JOY_TRESHOLD) joy2x1 = joystick.joy2_x1;
 		else joy2x1 = 0;
 
-		if (abs(joystick.joy2_y2) > treshold) joy2y2 = joystick.joy2_y2;
+		if (abs(joystick.joy2_y2) > JOY_TRESHOLD) joy2y2 = joystick.joy2_y2;
 		else joy2y2 = 0;
 
-		if (abs(joystick.joy2_x2) > treshold) joy2x2 = joystick.joy2_x2;
+		if (abs(joystick.joy2_x2) > JOY_TRESHOLD) joy2x2 = joystick.joy2_x2;
 		else joy2x2 = 0;
 
 		// Normalize the values
@@ -152,25 +151,25 @@ task main(){
 		// Assign the x1 variable to the steering variable
 		steering = joy1x1;
 
-		// Divide the steering variable by the factor given in steer_sensitivity
-		steering = steering / steer_sensitivity;
+		// Divide the steering variable by the factor given in JOY_STEER_SENSITIVITY
+		steering = steering / JOY_STEER_SENSITIVITY;
 
 		// Only divide the power and the steering
 		// by boost if the boost is not pressed on the driver's joystick
-		if(!joy1Btn(btn_boost)){
-			power = power / limiter;
-			steering = steering / limiter;
+		if(!joy1Btn(JOY_BTN_BOOST)){
+			power = power / JOY_LIMITER;
+			steering = steering / JOY_LIMITER;
 		}
 
 		// Assign the power to the variables
 		// But first check the reverse_steering bool status
-		if(reverse_steering){
+		#if JOY_REVERSE_STEER
 			right_engine = power + steering;
 			left_engine  = power - steering;
-		}else{
+		#else
 			right_engine = power - steering;
 			left_engine  = power + steering;
-		}
+		#endif
 
 		// Assign the calculated values to the engines
 		motor[left_front] = left_engine;
@@ -179,7 +178,7 @@ task main(){
 		motor[right_back] = right_engine;
 
 		// Control the brush
-		if(joy1Btn(btn_brush) && releasebtn){
+		if(joy1Btn(JOY_BTN_BRUSH) && releasebtn){
 			if(switching){
 				switching = false;
 				motor[flapper] = 100;
@@ -189,10 +188,10 @@ task main(){
 			}
 			releasebtn = false;
 		}
-		if(!joy1Btn(btn_brush) && !releasebtn) releasebtn = true;
+		if(!joy1Btn(JOY_BTN_BRUSH) && !releasebtn) releasebtn = true;
 
 		// Control the servo
-		if(joy1Btn(btn_grabber) && releasebtn2){
+		if(joy1Btn(JOY_BTN_GRABBER) && releasebtn2){
 			if(switching2){
 				switching2 = false;
 				// Dicht
@@ -204,10 +203,10 @@ task main(){
 			}
 			releasebtn2 = false;
 		}
-		if(!joy1Btn(btn_grabber) && !releasebtn2) releasebtn2 = true;
+		if(!joy1Btn(JOY_BTN_GRABBER) && !releasebtn2) releasebtn2 = true;
 
 		// Control the servo
-		if(joy2Btn(btn_releaser) && releasebtn3){
+		if(joy2Btn(JOY_BTN_RELEASER) && releasebtn3){
 			if(switching3){
 				switching3 = false;
 				// Dicht
@@ -219,13 +218,13 @@ task main(){
 			}
 			releasebtn3 = false;
 		}
-		if(!joy2Btn(btn_releaser) && !releasebtn3) releasebtn3 = true;
+		if(!joy2Btn(JOY_BTN_RELEASER) && !releasebtn3) releasebtn3 = true;
 
 		// Control the lift
 		motor[lift_left] = joy2y1;
 		motor[lift_right] = joy2y1;
 
 		// Wait the amount of milliseconds given above
-		wait1Msec(loop_delay);
+		wait1Msec(JOY_LOOP_DELAY);
 	}
 }
